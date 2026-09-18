@@ -2,9 +2,10 @@ import { isConfigured, modelName } from './groqClient.ts';
 import { explainMedicalReport as groqExplain } from './medicalExplanation.ts';
 import { extractPrescription as groqExtract } from './prescriptionExtraction.ts';
 import { compareReports as groqCompare } from './reportComparison.ts';
-import { mockCompareReports, mockExplainReport, mockExtractPrescription } from './mock.ts';
+import { mockCompareReports, mockExplainReport, mockExtractPrescription, mockTranscribe } from './mock.ts';
+import { sttModelName, transcribe } from './speechToText.ts';
 import type {
-  AIResult, CompareReportsInput, CompareReportsOutput, ExplainReportInput,
+  AIResult, CompareReportsInput, Language, CompareReportsOutput, ExplainReportInput,
   ExplainReportOutput, ExtractPrescriptionOutput,
 } from './types.ts';
 
@@ -39,6 +40,21 @@ export async function compareReports(
 ): Promise<AIResult<CompareReportsOutput>> {
   if (!isConfigured()) return withMeta(mockCompareReports(input), 'mock');
   return withMeta(await groqCompare(input), 'groq');
+}
+
+/** Audio in, words out. Used only where the browser cannot listen itself. */
+export async function transcribeSpeech(
+  audio: Uint8Array,
+  contentType: string,
+  language: Language,
+): Promise<{ text: string; meta: { source: 'groq' | 'mock'; model: string } }> {
+  if (!isConfigured()) {
+    return { text: mockTranscribe(language), meta: { source: 'mock', model: 'mock' } };
+  }
+  return {
+    text: await transcribe(audio, contentType, language),
+    meta: { source: 'groq', model: sttModelName() },
+  };
 }
 
 export function aiStatus() {

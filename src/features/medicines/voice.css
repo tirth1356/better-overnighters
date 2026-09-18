@@ -1,0 +1,53 @@
+.voice { display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start; }
+
+.voice__row { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+
+/* Deliberately oversized: this is the control an older relative uses. */
+.voice__mic {
+  display: inline-flex; align-items: center; gap: var(--space-3);
+  background: var(--sage); color: var(--ivory); border: none;
+  border-radius: 999px; padding: 14px 26px; font-size: 1.05rem; font-weight: 700;
+  cursor: pointer; box-shadow: var(--shadow-sm);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.voice__mic:hover { background: #6d8060; box-shadow: var(--shadow); }
+.voice__mic:active { transform: translateY(1px); }
+.voice__mic[disabled] { opacity: 0.55; cursor: not-allowed; }
+.voice__mic--listening { background: var(--clay); }
+.voice__mic--listening:hover { background: #9c4136; }
+
+/* A calm pulse while listening — never a flashing alarm. */
+.voice__pulse {
+  width: 12px; height: 12px; border-radius: 50%; background: currentColor;
+  animation: voicePulse 1.4s ease-in-out infinite;
+}
+@keyframes voicePulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .voice__pulse { animation: none; opacity: 1; }
+}
+
+.voice__langs { display: flex; gap: 6px; }
+.voice__lang {
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-muted);
+  border-radius: 999px; padding: 7px 14px; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+}
+.voice__lang:hover { background: var(--cream); color: var(--espresso); }
+.voice__lang[aria-pressed='true'] {
+  background: var(--sage-soft); border-color: var(--sage); color: #4f6142;
+}
+
+.voice__said {
+  background: var(--surface-sunken); border-left: 3px solid var(--sage);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--space-3) var(--space-4); font-size: 1rem;
+}
+.voice__said b { font-weight: 700; }
+.voice__hint { color: var(--text-muted); font-size: 0.87rem; }
+.voice__error {
+  background: var(--clay-soft); color: var(--clay); border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4); font-size: 0.92rem; font-weight: 600;
+}
+.voice__choices { display: flex; gap: var(--space-2); flex-wrap: wrap; }

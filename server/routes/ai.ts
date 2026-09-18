@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import { compareReports, explainMedicalReport, extractPrescription } from '../services/ai/index.ts';
+import { Router, raw } from 'express';
+import { compareReports, explainMedicalReport, extractPrescription, transcribeSpeech } from '../services/ai/index.ts';
 import { isLanguage } from '../services/ai/prompts.ts';
 import type { Language } from '../services/ai/types.ts';
 
@@ -65,3 +65,30 @@ aiRouter.post('/compare-reports', async (req, res, next) => {
     next(err);
   }
 });
+
+/**
+ * Speech-to-text for browsers without the Web Speech API.
+ *
+ * The audio arrives as a raw body rather than multipart: one recording, one
+ * request, no upload parser to add. Capped well below anything a dose command
+ * needs, so a stray large upload cannot tie up the model.
+ */
+const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
+
+aiRouter.post(
+  '/transcribe',
+  raw({ type: ['audio/*', 'application/octet-stream'], limit: MAX_AUDIO_BYTES }),
+  async (req, res, next) => {
+    try {
+      const audio = req.body as Buffer;
+      if (!Buffer.isBuffer(audio) || audio.length === 0) {
+        throw new BadRequest('Expected an audio body');
+      }
+      const lang = language(typeof req.query.language === 'string' ? req.query.language : undefined);
+      const contentType = req.get('content-type') ?? 'audio/webm';
+      res.json(await transcribeSpeech(audio, contentType, lang));
+    } catch (err) {
+      next(err);
+    }
+  },
+);

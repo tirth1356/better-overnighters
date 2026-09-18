@@ -9,6 +9,7 @@ import { deleteMedicine, setDoseStatus, useDB } from '../../lib/store';
 import type { DoseStatus, MealRelation, Medicine } from '../../types';
 import PrescriptionImport from '../ai/PrescriptionImport';
 import { doseTimes, dosesPerDay, mealRelation } from '@/lib/normalize';
+import VoiceDoseLogger from './VoiceDoseLogger';
 import MedicineCalendar from './MedicineCalendar';
 import MedicineForm from './MedicineForm';
 import './medicines.css';
@@ -142,6 +143,8 @@ export default function MedicinesPage() {
           title={selected === today ? 'Today' : longDate(selected)}
           subtitle={`${slots.length} dose${slots.length === 1 ? '' : 's'} scheduled`}
         >
+          <VoiceDoseLogger slots={slots} date={selected} />
+
           {slots.length === 0 ? (
             <EmptyState
               icon={<Pill size={34} />}

@@ -70,3 +70,13 @@ export function mockCompareReports(input: CompareReportsInput): CompareReportsOu
     disclaimer: DISCLAIMER[lang],
   };
 }
+
+/** Spoken phrase stand-in, in the language that was asked for. */
+export function mockTranscribe(language: Language): string {
+  const phrases: Record<Language, string> = {
+    en: 'I have taken my medicine',
+    hi: 'मैंने दवा ले ली',
+    gu: 'મેં દવા લીધી',
+  };
+  return `${phrases[language]} ${BANNER[language]}`;
+}
