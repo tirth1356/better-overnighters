@@ -49,3 +49,12 @@ test('calendar grid is Monday-first and week-aligned', () => {
 test('toISODate uses local time, not UTC', () => {
   assert.equal(toISODate(new Date(2026, 8, 1, 23, 30)), '2026-09-01');
 });
+
+test('vaccination status keys off the next due date', async () => {
+  const { vaccinationStatus } = await import('./vaccination.ts');
+  const base = { id: 'v', familyMemberId: 'f', vaccine: 'DTP', dose: '1' };
+  assert.equal(vaccinationStatus({ ...base, nextDueDate: '2026-09-01' }, '2026-09-15'), 'overdue');
+  assert.equal(vaccinationStatus({ ...base, nextDueDate: '2026-09-30' }, '2026-09-15'), 'upcoming');
+  assert.equal(vaccinationStatus({ ...base, date: '2026-01-02' }, '2026-09-15'), 'completed');
+  assert.equal(vaccinationStatus(base, '2026-09-15'), 'upcoming');
+});

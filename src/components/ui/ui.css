@@ -1,0 +1,91 @@
+/* Shared primitives for the medicine / doctor / vaccination / emergency modules. */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+}
+.card--flat { box-shadow: none; }
+.card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-3); margin-bottom: var(--space-4);
+}
+.card__title { font-size: 1.15rem; }
+.card__sub { color: var(--text-muted); font-size: 0.9rem; margin-top: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  border: 1px solid transparent; border-radius: 999px;
+  padding: 10px 18px; font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; background: var(--terracotta); color: var(--ivory);
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+.btn:hover { background: #ad5534; box-shadow: var(--shadow); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn--ghost { background: transparent; color: var(--espresso); border-color: var(--border); }
+.btn--ghost:hover { background: var(--beige); box-shadow: none; }
+.btn--sage { background: var(--sage); }
+.btn--sage:hover { background: #6d8060; }
+.btn--danger { background: transparent; color: var(--clay); border-color: var(--clay-soft); }
+.btn--danger:hover { background: var(--clay-soft); box-shadow: none; }
+.btn--sm { padding: 6px 13px; font-size: 0.85rem; }
+.btn--block { width: 100%; justify-content: center; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--space-4); }
+.field__label { font-size: 0.88rem; font-weight: 600; color: var(--text-muted); }
+.field__hint { font-size: 0.8rem; color: var(--text-muted); }
+.field input, .field select, .field textarea {
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 11px 13px; width: 100%;
+}
+.field input:hover, .field select:hover, .field textarea:hover { border-color: var(--brown); }
+.field textarea { min-height: 84px; resize: vertical; }
+
+.grid { display: grid; gap: var(--space-4); }
+.grid--2 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.grid--3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 4px 11px; font-size: 0.8rem; font-weight: 600;
+  background: var(--beige); color: var(--brown);
+}
+.pill--taken { background: var(--sage-soft); color: #4f6142; }
+.pill--pending { background: var(--amber-soft); color: #8a6011; }
+.pill--missed { background: var(--clay-soft); color: var(--clay); }
+.pill--skipped { background: var(--sand); color: var(--espresso-soft); }
+
+.modal__scrim {
+  position: fixed; inset: 0; background: rgba(59, 47, 40, 0.42);
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--space-4); z-index: 50;
+}
+.modal {
+  background: var(--surface); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); width: min(680px, 100%);
+  max-height: 90vh; overflow-y: auto; padding: var(--space-6);
+}
+.modal__head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--space-4); margin-bottom: var(--space-5);
+}
+.icon-btn {
+  background: transparent; border: none; cursor: pointer; color: var(--text-muted);
+  border-radius: 50%; padding: 6px; display: inline-flex;
+}
+.icon-btn:hover { background: var(--beige); color: var(--espresso); }
+
+.empty {
+  text-align: center; padding: var(--space-7) var(--space-4); color: var(--text-muted);
+  border: 1px dashed var(--border); border-radius: var(--radius-lg); background: var(--surface-sunken);
+}
+.empty svg { color: var(--brown); opacity: 0.55; margin-bottom: var(--space-3); }
+
+.section-title {
+  display: flex; align-items: center; gap: var(--space-3);
+  margin: var(--space-6) 0 var(--space-4);
+}
+.section-title h2 { font-size: 1.35rem; }
