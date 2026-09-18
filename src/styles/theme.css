@@ -1,0 +1,90 @@
+/* Warm family-health design tokens. Shared file — additive only. */
+:root {
+  --cream: #fdf8f1;
+  --ivory: #fffdf9;
+  --beige: #f2e7d8;
+  --sand: #e8dac6;
+  --terracotta: #c2643f;
+  --terracotta-soft: #f0d5c8;
+  --sage: #7d9070;
+  --sage-soft: #dfe6d8;
+  --brown: #8a6a4f;
+  --espresso: #3b2f28;
+  --espresso-soft: #6e6058;
+  --amber: #d99a2b;
+  --amber-soft: #f7e6c4;
+  --clay: #b04a3c;
+  --clay-soft: #f3d9d5;
+
+  --surface: var(--ivory);
+  --surface-sunken: var(--cream);
+  --border: var(--sand);
+  --text: var(--espresso);
+  --text-muted: var(--espresso-soft);
+
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(59, 47, 40, 0.06);
+  --shadow: 0 6px 18px rgba(59, 47, 40, 0.08);
+  --shadow-lg: 0 18px 40px rgba(59, 47, 40, 0.12);
+
+  --font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--espresso);
+}
+
+a { color: var(--terracotta); }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--terracotta);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -44,16 +44,19 @@ export type Relationship =
   | 'Sister'
   | 'Uncle'
   | 'Aunt'
-  | 'Other';
+  | 'Other'
+  | string;
 
 export interface FamilyMember {
   id: string;
   name: string;
   relationship: Relationship;
+  relation?: string; // Person 3 compat
   dateOfBirth: string;        // ISO date string: YYYY-MM-DD
   gender: Gender;
   bloodGroup: BloodGroup;
   avatarUrl?: string;
+  photo?: string; // Person 3 compat
   avatarInitials?: string;    // fallback: "TH", "MOM" etc.
   avatarColor?: string;       // CSS hex for the initials avatar bg
   allergies: string[];
@@ -71,7 +74,9 @@ export interface Doctor {
   id: string;
   name: string;
   specialty: string;
+  specialization?: string; // Person 3 compat
   hospital?: string;
+  clinic?: string; // Person 3 compat
   phone?: string;
   email?: string;
   address?: string;
@@ -95,6 +100,7 @@ export interface MedicalRecord {
   familyMemberId: string;
   title: string;
   type: MedicalRecordType;
+  kind?: 'report' | 'prescription'; // Person 3 compat
   date: string;               // ISO date
   doctorId?: string;
   doctorName?: string;
@@ -104,6 +110,8 @@ export interface MedicalRecord {
   tags?: string[];
   notes?: string;
 }
+
+export type MedicalRecordRef = MedicalRecord; // Person 3 compat alias
 
 // ─── Prescription ────────────────────────────────────────────────
 export interface Prescription {
@@ -125,9 +133,11 @@ export type MedicineFrequency =
   | 'Three times daily'
   | 'As needed'
   | 'Weekly'
-  | 'Other';
+  | 'Other'
+  | number; // Person 3 compat
 
 export type MedicineTiming = 'Before meal' | 'After meal' | 'With meal' | 'Anytime';
+export type MealRelation = 'before_food' | 'after_food' | 'with_food' | 'any'; // Person 3 compat
 
 export interface MedicineDose {
   id: string;
@@ -138,6 +148,17 @@ export interface MedicineDose {
   date: string;               // YYYY-MM-DD
 }
 
+export type DoseStatus = 'taken' | 'pending' | 'missed' | 'skipped';
+
+export interface DoseLog {
+  id: string;
+  medicineId: string;
+  date: string;
+  time: string;
+  status: Exclude<DoseStatus, 'pending'>;
+  recordedAt: string;
+}
+
 export interface Medicine {
   id: string;
   familyMemberId: string;
@@ -145,26 +166,37 @@ export interface Medicine {
   name: string;
   dosage: string;             // e.g. "500mg"
   frequency: MedicineFrequency;
+  times?: string[];           // Person 3 compat
   timing: MedicineTiming;
+  beforeAfterFood?: MealRelation; // Person 3 compat
   startDate: string;
   endDate?: string;
+  duration?: number;          // Person 3 compat
   isActive: boolean;
   refillDate?: string;
   purpose?: string;
   sideEffects?: string[];
   doses?: MedicineDose[];
+  doctorId?: string;          // Person 3 compat
+  notes?: string;
 }
 
 // ─── Vaccination ─────────────────────────────────────────────────
+export type VaccinationStatus = 'completed' | 'upcoming' | 'overdue';
+
 export interface Vaccination {
   id: string;
   familyMemberId: string;
   name: string;
+  vaccine?: string;           // Person 3 compat
+  dose?: string;              // Person 3 compat
   dateAdministered: string;
+  date?: string;              // Person 3 compat
   nextDueDate?: string;
   doctorId?: string;
   hospital?: string;
   batchNumber?: string;
+  document?: string;          // Person 3 compat
   notes?: string;
 }
 
@@ -197,6 +229,17 @@ export interface EmergencyProfile {
   doctorPhone?: string;
   insuranceProvider?: string;
   insurancePolicyNumber?: string;
+  notes?: string;
+}
+
+export interface EmergencyCard {
+  familyMemberId: string;
+  bloodGroup?: string;
+  allergies: string[];
+  conditions: string[];
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  primaryDoctorId?: string;
   notes?: string;
 }
 
