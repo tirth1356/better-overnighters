@@ -6,15 +6,30 @@ import { RecordFilters } from './RecordFilters';
 import { CategorySidebar } from './CategorySidebar';
 
 export default function MedicalRecordsPage() {
-  const { filteredRecords, getFamilyMemberById, getDoctorById } = useMedical();
+  const { filteredRecords, getFamilyMemberById, getDoctorById, isNeonConnected } = useMedical();
 
   return (
     <div className="min-h-full space-y-6 animate-fade-up" style={{ maxWidth: '1200px' }}>
       {/* Page Header */}
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-3xl font-serif text-espresso">Medical Records Vault</h1>
+            <span
+              className={`text-xs px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5 ${
+                isNeonConnected
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'bg-[#F5EBE1] text-[#7A6250] border border-[#E8DDD0]'
+              }`}
+              title={isNeonConnected ? 'Reports synced with Neon PostgreSQL database' : 'Reports saved in local vault'}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  isNeonConnected ? 'bg-emerald-500 animate-pulse' : 'bg-[#9C826B]'
+                }`}
+              />
+              {isNeonConnected ? 'Neon SQL Active' : 'Local Vault'}
+            </span>
           </div>
           <p className="text-warm-muted text-sm mt-1">
             {filteredRecords.length} record{filteredRecords.length !== 1 ? 's' : ''} preserved in your family digital health archive

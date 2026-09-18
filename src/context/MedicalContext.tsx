@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import type {
   MedicalRecord,
   FamilyMember,
@@ -14,11 +14,12 @@ interface MedicalContextValue {
   familyMembers: FamilyMember[];
   doctors: Doctor[];
   timeline: MedicalTimelineEvent[];
+  isNeonConnected: boolean;
 
   // Actions
-  addRecord: (record: MedicalRecord) => void;
-  updateRecord: (id: string, updates: Partial<MedicalRecord>) => void;
-  deleteRecord: (id: string) => void;
+  addRecord: (record: MedicalRecord) => Promise<void>;
+  updateRecord: (id: string, updates: Partial<MedicalRecord>) => Promise<void>;
+  deleteRecord: (id: string) => Promise<void>;
 
   // Helpers
   getRecordById: (id: string) => MedicalRecord | undefined;
@@ -46,20 +47,78 @@ const MedicalContext = createContext<MedicalContextValue | null>(null);
 export function MedicalProvider({ children }: { children: React.ReactNode }) {
   const db = useDB();
   const [filters, setFilters] = useState<RecordFilters>(defaultFilters);
+  const [isNeonConnected, setIsNeonConnected] = useState(false);
 
-  const addRecord = useCallback((record: MedicalRecord) => {
-    storeSaveRecord(record);
+  // Sync with Neon SQL on initial load
+  useEffect(() => {
+    let active = true;
+    async function syncFromNeon() {
+      try {
+        const res = await fetch('/api/records');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!active) return;
+        if (data.configured) {
+          setIsNeonConnected(true);
+        }
+        if (Array.isArray(data.records) && data.records.length > 0) {
+          data.records.forEach((rec: MedicalRecord) => {
+            storeSaveRecord(rec);
+          });
+        }
+      } catch {
+        // Local offline / demo fallback
+      }
+    }
+    syncFromNeon();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const updateRecord = useCallback((id: string, updates: Partial<MedicalRecord>) => {
+  const addRecord = useCallback(async (record: MedicalRecord) => {
+    // 1. Immediate optimistic reactive store update
+    storeSaveRecord(record);
+
+    // 2. Persist to Neon SQL backend
+    try {
+      const res = await fetch('/api/records', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record),
+      });
+      if (res.ok) {
+        setIsNeonConnected(true);
+      }
+    } catch (err) {
+      console.warn('[MedicalContext] Neon SQL sync deferred:', err);
+    }
+  }, []);
+
+  const updateRecord = useCallback(async (id: string, updates: Partial<MedicalRecord>) => {
     const existing = db.records.find(r => r.id === id);
     if (existing) {
-      storeSaveRecord({ ...existing, ...updates });
+      const merged = { ...existing, ...updates };
+      storeSaveRecord(merged);
+      try {
+        await fetch('/api/records', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(merged),
+        });
+      } catch (err) {
+        console.warn('[MedicalContext] Update Neon SQL sync deferred:', err);
+      }
     }
   }, [db.records]);
 
-  const deleteRecord = useCallback((id: string) => {
+  const deleteRecord = useCallback(async (id: string) => {
     storeDeleteRecord(id);
+    try {
+      await fetch(`/api/records/${id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('[MedicalContext] Delete Neon SQL sync deferred:', err);
+    }
   }, []);
 
   const getRecordById = useCallback(
@@ -160,6 +219,7 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
         familyMembers: db.members,
         doctors: db.doctors,
         timeline,
+        isNeonConnected,
         addRecord,
         updateRecord,
         deleteRecord,

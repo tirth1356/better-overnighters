@@ -61,8 +61,8 @@ export default function RecordUploadPage() {
       summary: form.notes.trim() || 'Uploaded to secure digital health vault.',
     };
 
-    // Save to unified store
-    addRecord(record);
+    // Save to unified store and persist to Neon SQL
+    await addRecord(record);
     setIsSubmitting(false);
 
     // Navigate to the newly uploaded record detail page

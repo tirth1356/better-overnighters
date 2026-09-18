@@ -22,7 +22,7 @@ export function isConfigured(): boolean {
 }
 
 export function modelName(): string {
-  return process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  return process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
 }
 
 export class AIError extends Error {
