@@ -1,5 +1,6 @@
 // @ts-nocheck
 import type { Doctor, EmergencyCard, FamilyMember } from '../../types';
+import { doctorSpecialty } from '@/lib/normalize';
 
 /**
  * Flat, self-contained snapshot of an emergency card.
@@ -34,7 +35,7 @@ export function emergencyPayload(
       phone: card?.emergencyContactPhone ?? '',
     },
     primaryDoctor: doctor
-      ? { name: doctor.name, phone: doctor.phone ?? '', specialization: doctor.specialization }
+      ? { name: doctor.name, phone: doctor.phone ?? '', specialization: doctorSpecialty(doctor) }
       : null,
     notes: card?.notes ?? '',
   };

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import type { DoseLog, DoseStatus, Medicine } from '../types';
+import { doseTimes, repeatsOnDate } from './normalize.ts';
 
 /** Local-date ISO string ("YYYY-MM-DD") — never UTC, doses are local events. */
 export function toISODate(d: Date): string {
@@ -19,9 +20,10 @@ export function addDays(iso: string, days: number): string {
 }
 
 export function isActiveOn(med: Medicine, date: string): boolean {
+  if (med.isActive === false) return false;
   if (date < med.startDate) return false;
   if (med.endDate && date > med.endDate) return false;
-  return true;
+  return repeatsOnDate(med, date);
 }
 
 export interface DoseSlot {
@@ -45,7 +47,7 @@ export function scheduleFor(
   const slots: DoseSlot[] = [];
   for (const medicine of medicines) {
     if (!isActiveOn(medicine, date)) continue;
-    for (const time of medicine.times) {
+    for (const time of doseTimes(medicine)) {
       const log = doses.find(
         (x) => x.medicineId === medicine.id && x.date === date && x.time === time,
       );

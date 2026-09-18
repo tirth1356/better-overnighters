@@ -12,14 +12,16 @@ import DashboardPage  from '@/pages/DashboardPage';
 import FamilyPage     from '@/pages/FamilyPage';
 import FamilyTreePage from '@/pages/FamilyTreePage';
 
-// Placeholder pages — Persons 2 & 3
-import {
-  MedicalRecordsPage,
-  MedicinesPage,
-  DoctorsPage,
-  VaccinationsPage,
-  EmergencyPage,
-} from '@/pages/PlaceholderPages';
+// Placeholder pages — Person 2 (medical records UI still lives in the Next.js tree)
+import { MedicalRecordsPage } from '@/pages/PlaceholderPages';
+
+// Person 3 pages
+import MedicinesPage      from '@/features/medicines/MedicinesPage';
+import DoctorsPage        from '@/features/doctors/DoctorsPage';
+import DoctorProfilePage  from '@/features/doctors/DoctorProfilePage';
+import VaccinationsPage   from '@/features/vaccinations/VaccinationsPage';
+import EmergencyPage      from '@/features/emergency/EmergencyPage';
+import ExplainPage        from '@/features/ai/ExplainPage';
 
 export const router = createBrowserRouter([
   // Public routes
@@ -41,14 +43,16 @@ export const router = createBrowserRouter([
           { path: '/family',         element: <FamilyPage /> },
           { path: '/family-tree',    element: <FamilyTreePage /> },
 
-          // Person 2 pages (placeholders)
+          // Person 2 pages
           { path: '/medical-records', element: <MedicalRecordsPage /> },
-          { path: '/medicines',       element: <MedicinesPage /> },
 
-          // Person 3 pages (placeholders)
-          { path: '/doctors',        element: <DoctorsPage /> },
-          { path: '/vaccinations',   element: <VaccinationsPage /> },
-          { path: '/emergency',      element: <EmergencyPage /> },
+          // Person 3 pages
+          { path: '/medicines',        element: <MedicinesPage /> },
+          { path: '/doctors',          element: <DoctorsPage /> },
+          { path: '/doctors/:doctorId', element: <DoctorProfilePage /> },
+          { path: '/vaccinations',     element: <VaccinationsPage /> },
+          { path: '/emergency',        element: <EmergencyPage /> },
+          { path: '/explain',          element: <ExplainPage /> },
         ],
       },
     ],

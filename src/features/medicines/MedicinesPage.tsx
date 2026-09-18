@@ -8,6 +8,7 @@ import {
 import { deleteMedicine, setDoseStatus, useDB } from '../../lib/store';
 import type { DoseStatus, MealRelation, Medicine } from '../../types';
 import PrescriptionImport from '../ai/PrescriptionImport';
+import { doseTimes, dosesPerDay, mealRelation } from '@/lib/normalize';
 import MedicineCalendar from './MedicineCalendar';
 import MedicineForm from './MedicineForm';
 import './medicines.css';
@@ -156,7 +157,7 @@ export default function MedicinesPage() {
                     {slot.medicine.name} {slot.medicine.dosage}
                   </div>
                   <div className="dose__meta">
-                    {slot.medicine.beforeAfterFood && MEAL_LABEL[slot.medicine.beforeAfterFood]}
+                    {MEAL_LABEL[mealRelation(slot.medicine)]}
                     {doctorName(slot.medicine.doctorId) && ` · ${doctorName(slot.medicine.doctorId)}`}
                   </div>
                 </div>
@@ -225,14 +226,14 @@ export default function MedicinesPage() {
                 <div style={{ minWidth: 0 }}>
                   <div className="med-card__name">{m.name}</div>
                   <div className="med-card__dose">
-                    {m.dosage} · {m.frequency}× daily
+                    {m.dosage} · {dosesPerDay(m)}× daily
                   </div>
                   {m.notes && <p className="card__sub">{m.notes}</p>}
                 </div>
               </div>
               <div className="med-card__tags">
-                {m.times?.map((t) => <span key={t} className="pill">{pretty(t)}</span>)}
-                {m.beforeAfterFood && <span className="pill">{MEAL_LABEL[m.beforeAfterFood]}</span>}
+                {doseTimes(m).map((t) => <span key={t} className="pill">{pretty(t)}</span>)}
+                <span className="pill">{MEAL_LABEL[mealRelation(m)]}</span>
                 {doctorName(m.doctorId) && <span className="pill">{doctorName(m.doctorId)}</span>}
                 <span className="pill">
                   {m.endDate ? `Until ${m.endDate}` : 'Ongoing'}

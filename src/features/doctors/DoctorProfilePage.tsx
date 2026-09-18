@@ -1,6 +1,7 @@
 import { ArrowLeft, FileText, Mail, MapPin, Phone, Pill, Stethoscope } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Card, EmptyState } from '../../components/ui';
+import { doctorSpecialty, dosesPerDay } from '@/lib/normalize';
 import { useDB } from '../../lib/store';
 import './doctors.css';
 
@@ -35,7 +36,7 @@ export default function DoctorProfilePage() {
 
       <header className="page-head">
         <h1>{doctor.name}</h1>
-        <p>{doctor.specialization}{doctor.hospital ? ` · ${doctor.hospital}` : ''}</p>
+        <p>{doctorSpecialty(doctor)}{doctor.hospital ? ` · ${doctor.hospital}` : ''}</p>
       </header>
 
       <div className="grid grid--2" style={{ marginBottom: 'var(--space-5)' }}>
@@ -108,7 +109,7 @@ export default function DoctorProfilePage() {
                   <div className="linked-list__main">
                     <div className="linked-list__title">{m.name} {m.dosage}</div>
                     <div className="linked-list__meta">
-                      {memberName(m.familyMemberId)} · {m.frequency}× daily
+                      {memberName(m.familyMemberId)} · {dosesPerDay(m)}× daily
                     </div>
                   </div>
                 </li>

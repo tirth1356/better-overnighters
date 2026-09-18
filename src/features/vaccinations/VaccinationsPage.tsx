@@ -5,6 +5,7 @@ import { Card, EmptyState, Field, Modal } from '../../components/ui';
 import { useMember } from '../../lib/member';
 import { fromISODate, toISODate } from '../../lib/schedule';
 import { deleteVaccination, newId, saveVaccination, useDB } from '../../lib/store';
+import { vaccineDate, vaccineName } from '@/lib/normalize';
 import { vaccinationStatus } from '../../lib/vaccination';
 import type { Vaccination, VaccinationStatus } from '../../types';
 import './vaccinations.css';
@@ -32,7 +33,8 @@ function VaccinationForm({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          saveVaccination({ ...v, vaccine: v.vaccine.trim() });
+          const name = vaccineName(v).trim();
+          saveVaccination({ ...v, vaccine: name, name });
           onClose();
         }}
       >
@@ -40,20 +42,20 @@ function VaccinationForm({
           <Field label="Vaccine">
             {(id) => (
               <input id={id} required autoFocus placeholder="e.g. DTP Booster"
-                value={v.vaccine} onChange={(e) => set('vaccine', e.target.value)} />
+                value={vaccineName(v)} onChange={(e) => set('vaccine', e.target.value)} />
             )}
           </Field>
           <Field label="Dose">
             {(id) => (
               <input id={id} required placeholder="e.g. Dose 2 / Booster"
-                value={v.dose} onChange={(e) => set('dose', e.target.value)} />
+                value={v.dose ?? ''} onChange={(e) => set('dose', e.target.value)} />
             )}
           </Field>
         </div>
         <div className="form-row">
           <Field label="Date given" hint="Leave empty if it is only scheduled.">
             {(id) => (
-              <input id={id} type="date" value={v.date ?? ''}
+              <input id={id} type="date" value={vaccineDate(v) ?? ''}
                 onChange={(e) => set('date', e.target.value || undefined)} />
             )}
           </Field>
@@ -93,7 +95,8 @@ export default function VaccinationsPage() {
   const mine = vaccinations
     .filter((v) => v.familyMemberId === member?.id)
     .map((v) => ({ ...v, status: vaccinationStatus(v, today) }))
-    .sort((a, b) => (b.nextDueDate ?? b.date ?? '').localeCompare(a.nextDueDate ?? a.date ?? ''));
+    .sort((a, b) =>
+      (b.nextDueDate ?? vaccineDate(b) ?? '').localeCompare(a.nextDueDate ?? vaccineDate(a) ?? ''));
 
   const count = (s: VaccinationStatus) => mine.filter((v) => v.status === s).length;
 
@@ -137,12 +140,12 @@ export default function VaccinationsPage() {
             {mine.map((v) => (
               <div key={v.id} className={`vax-item vax-item--${v.status}`}>
                 <div className="vax-item__head">
-                  <span className="vax-item__name">{v.vaccine}</span>
-                  <span className="pill">{v.dose}</span>
+                  <span className="vax-item__name">{vaccineName(v)}</span>
+                  {v.dose && <span className="pill">{v.dose}</span>}
                   <span className={`pill pill--${v.status}`}>{STATUS_LABEL[v.status]}</span>
                 </div>
                 <div className="vax-item__meta">
-                  {v.date ? `Given ${longDate(v.date)}` : 'Not given yet'}
+                  {vaccineDate(v) ? `Given ${longDate(vaccineDate(v)!)}` : 'Not given yet'}
                   {v.nextDueDate && (
                     <> · <CalendarClock size={13} style={{ verticalAlign: '-2px' }} /> Next due {longDate(v.nextDueDate)}</>
                   )}
@@ -160,10 +163,10 @@ export default function VaccinationsPage() {
                   <button
                     type="button"
                     className="btn btn--danger btn--sm"
-                    onClick={() => { if (confirm(`Remove ${v.vaccine}?`)) deleteVaccination(v.id); }}
+                    onClick={() => { if (confirm(`Remove ${vaccineName(v)}?`)) deleteVaccination(v.id); }}
                   >
                     <Trash2 size={15} />
-                    <span className="visually-hidden">Remove {v.vaccine}</span>
+                    <span className="visually-hidden">Remove {vaccineName(v)}</span>
                   </button>
                 </div>
               </div>

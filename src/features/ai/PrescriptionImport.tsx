@@ -24,9 +24,9 @@ function durationDays(duration: string): number | undefined {
  * confirms each row — extracted data is a suggestion, not a source of truth.
  */
 export default function PrescriptionImport({
-  familyMemberId, onClose,
-}: { familyMemberId: string; onClose: () => void }) {
-  const { doctors } = useDB();
+  familyMemberId, prescriptionId, onClose,
+}: { familyMemberId: string; prescriptionId?: string; onClose: () => void }) {
+  const { doctors, medicines } = useDB();
   const [text, setText] = useState('');
   const [result, setResult] = useState<PrescriptionExtraction | null>(null);
   const [chosen, setChosen] = useState<Set<number>>(new Set());
@@ -49,13 +49,21 @@ export default function PrescriptionImport({
 
   const save = () => {
     if (!result) return;
+    // Re-running extraction must not file the same medicine twice.
+    const alreadySaved = (name: string, dosage: string) =>
+      medicines.some(
+        (x) =>
+          x.familyMemberId === familyMemberId &&
+          x.name.trim().toLowerCase() === name.trim().toLowerCase() &&
+          (x.dosage ?? '').trim().toLowerCase() === dosage.trim().toLowerCase(),
+      );
     const today = toISODate(new Date());
     const doctorId = doctors.find(
       (d) => result.doctorName && d.name.toLowerCase().includes(result.doctorName.toLowerCase().replace('dr.', '').trim()),
     )?.id;
 
     result.medicines.forEach((m, i) => {
-      if (!chosen.has(i)) return;
+      if (!chosen.has(i) || alreadySaved(m.medicineName, m.dosage)) return;
       const days = durationDays(m.duration);
       const times = m.times.length > 0 ? m.times : ['08:00'];
       const med: Medicine = {
@@ -68,6 +76,12 @@ export default function PrescriptionImport({
         startDate: today,
         duration: days,
         beforeAfterFood: m.beforeAfterFood,
+        // keep Person 1's fields populated so the dashboard counts this medicine
+        timing: m.beforeAfterFood === 'before_food' ? 'Before meal'
+          : m.beforeAfterFood === 'with_food' ? 'With meal'
+          : m.beforeAfterFood === 'any' ? 'Anytime' : 'After meal',
+        isActive: true,
+        prescriptionId,
         doctorId,
         notes: `Added from a prescription${m.duration ? ` · ${m.duration}` : ''}. Please check the details.`,
       };

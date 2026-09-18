@@ -3,6 +3,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Field, Modal } from '../../components/ui';
 import { addDays, fromISODate, toISODate } from '../../lib/schedule';
+import { doctorSpecialty, doseTimes, mealRelation } from '@/lib/normalize';
 import { newId, saveMedicine, useDB } from '../../lib/store';
 import type { MealRelation, Medicine } from '../../types';
 
@@ -33,7 +34,11 @@ export default function MedicineForm({
   familyMemberId, editing, onClose,
 }: { familyMemberId: string; editing?: Medicine; onClose: () => void }) {
   const { doctors, records } = useDB();
-  const [med, setMed] = useState<Medicine>(editing ?? blank(familyMemberId));
+  const [med, setMed] = useState<Medicine>(
+    editing
+      ? { ...editing, times: doseTimes(editing), beforeAfterFood: mealRelation(editing) }
+      : blank(familyMemberId),
+  );
   const set = <K extends keyof Medicine>(key: K, value: Medicine[K]) =>
     setMed((m) => ({ ...m, [key]: value }));
 
@@ -198,7 +203,7 @@ export default function MedicineForm({
               >
                 <option value="">Not linked</option>
                 {doctors.map((d) => (
-                  <option key={d.id} value={d.id}>{d.name} — {d.specialization}</option>
+                  <option key={d.id} value={d.id}>{d.name} — {doctorSpecialty(d)}</option>
                 ))}
               </select>
             )}

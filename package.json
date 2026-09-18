@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -n web,api -c magenta,green \"vite\" \"npm:dev:api\"",
+    "dev:web": "vite",
+    "dev:api": "node --watch server/index.ts",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
+    "test": "node --test src/lib/*.test.ts server/services/ai/*.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

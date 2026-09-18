@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, EmptyState } from '../../components/ui';
 import { deleteDoctor, useDB } from '../../lib/store';
 import type { Doctor } from '../../types';
+import { doctorSpecialty } from '@/lib/normalize';
 import DoctorForm from './DoctorForm';
 import './doctors.css';
 
@@ -14,7 +15,7 @@ export default function DoctorsPage() {
   const [form, setForm] = useState<{ open: boolean; editing?: Doctor }>({ open: false });
 
   const specializations = useMemo(
-    () => [...new Set(doctors.map((d) => d.specialization))].sort(),
+    () => [...new Set(doctors.map(doctorSpecialty).filter(Boolean))].sort(),
     [doctors],
   );
 
@@ -22,9 +23,9 @@ export default function DoctorsPage() {
     const q = query.trim().toLowerCase();
     const matchesQuery =
       !q ||
-      [d.name, d.specialization, d.hospital, d.clinic]
+      [d.name, doctorSpecialty(d), d.hospital, d.clinic]
         .some((f) => f?.toLowerCase().includes(q));
-    return matchesQuery && (!spec || d.specialization === spec);
+    return matchesQuery && (!spec || doctorSpecialty(d) === spec);
   });
 
   const linkCount = (id: string) =>
@@ -72,7 +73,7 @@ export default function DoctorsPage() {
                 <span className="doctor-card__avatar"><Stethoscope size={22} /></span>
                 <div style={{ minWidth: 0 }}>
                   <div className="doctor-card__name">{d.name}</div>
-                  <div className="doctor-card__spec">{d.specialization}</div>
+                  <div className="doctor-card__spec">{doctorSpecialty(d)}</div>
                   {(d.hospital || d.clinic) && (
                     <div className="doctor-card__where">{[d.hospital, d.clinic].filter(Boolean).join(' · ')}</div>
                   )}

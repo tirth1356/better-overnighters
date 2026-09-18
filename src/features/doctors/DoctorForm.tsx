@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState } from 'react';
 import { Field, Modal } from '../../components/ui';
+import { doctorSpecialty } from '@/lib/normalize';
 import { newId, saveDoctor } from '../../lib/store';
 import type { Doctor } from '../../types';
 
@@ -8,7 +9,7 @@ export default function DoctorForm({
   editing, onClose,
 }: { editing?: Doctor; onClose: () => void }) {
   const [doc, setDoc] = useState<Doctor>(
-    editing ?? { id: newId(), name: '', specialization: '' },
+    editing ?? { id: newId(), name: '', specialty: '', specialization: '', familyMemberIds: [] },
   );
   const set = <K extends keyof Doctor>(k: K, v: Doctor[K]) => setDoc((d) => ({ ...d, [k]: v }));
 
@@ -31,7 +32,8 @@ export default function DoctorForm({
           <Field label="Specialization">
             {(id) => (
               <input id={id} required placeholder="Endocrinologist"
-                value={doc.specialization} onChange={(e) => set('specialization', e.target.value)} />
+                value={doctorSpecialty(doc)}
+                onChange={(e) => setDoc((d) => ({ ...d, specialty: e.target.value, specialization: e.target.value }))} />
             )}
           </Field>
         </div>

@@ -1,4 +1,5 @@
 import type { Vaccination, VaccinationStatus } from '../types';
+import { vaccineDate } from './normalize.ts';
 
 /**
  * A dose is overdue once its next-due date has passed, upcoming while that date
@@ -6,5 +7,5 @@ import type { Vaccination, VaccinationStatus } from '../types';
  */
 export function vaccinationStatus(v: Vaccination, today: string): VaccinationStatus {
   if (v.nextDueDate) return v.nextDueDate < today ? 'overdue' : 'upcoming';
-  return v.date ? 'completed' : 'upcoming';
+  return vaccineDate(v) ? 'completed' : 'upcoming';
 }
