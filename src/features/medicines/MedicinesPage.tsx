@@ -9,7 +9,6 @@ import { deleteMedicine, setDoseStatus, useDB } from '../../lib/store';
 import type { DoseStatus, MealRelation, Medicine } from '../../types';
 import PrescriptionImport from '../ai/PrescriptionImport';
 import { doseTimes, dosesPerDay, mealRelation } from '@/lib/normalize';
-import MemberSwitcher from '../common/MemberSwitcher';
 import MedicineCalendar from './MedicineCalendar';
 import MedicineForm from './MedicineForm';
 import './medicines.css';
@@ -66,7 +65,6 @@ export default function MedicinesPage() {
 
   return (
     <>
-      <MemberSwitcher />
       <header className="page-head">
         <div className="page-head__row">
           <div>
