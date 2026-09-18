@@ -1,7 +1,7 @@
 import { ArrowLeft, FileText, Mail, MapPin, Phone, Pill, Stethoscope } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { Card, EmptyState } from '../../components/ui';
-import { doctorSpecialty, dosesPerDay } from '@/lib/normalize';
+import { doctorSpecialty, dosesPerDay, recordKind } from '@/lib/normalize';
 import { useDB } from '../../lib/store';
 import './doctors.css';
 
@@ -23,8 +23,8 @@ export default function DoctorProfilePage() {
 
   const theirMedicines = medicines.filter((m) => m.doctorId === doctor.id);
   const theirRecords = records.filter((r) => r.doctorId === doctor.id);
-  const reports = theirRecords.filter((r) => r.kind === 'report');
-  const prescriptions = theirRecords.filter((r) => r.kind === 'prescription');
+  const reports = theirRecords.filter((r) => recordKind(r) === 'report');
+  const prescriptions = theirRecords.filter((r) => recordKind(r) === 'prescription');
   const memberName = (id: string) => members.find((m) => m.id === id)?.name ?? 'Unknown';
   const treated = [
     ...new Set([...theirMedicines, ...theirRecords].map((x) => x.familyMemberId)),

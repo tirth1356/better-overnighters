@@ -5,6 +5,7 @@ import { initials, useMember } from '../../lib/member';
 import { saveEmergencyCard, useDB } from '../../lib/store';
 import type { EmergencyCard } from '../../types';
 import { emergencyPayload } from './emergencyPayload';
+import MemberSwitcher from '../common/MemberSwitcher';
 import './emergency.css';
 
 const toList = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean);
@@ -107,6 +108,7 @@ export default function EmergencyPage() {
 
   return (
     <>
+      <MemberSwitcher />
       <header className="page-head">
         <div className="page-head__row">
           <div>

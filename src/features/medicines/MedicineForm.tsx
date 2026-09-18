@@ -3,7 +3,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Field, Modal } from '../../components/ui';
 import { addDays, fromISODate, toISODate } from '../../lib/schedule';
-import { doctorSpecialty, doseTimes, mealRelation } from '@/lib/normalize';
+import { doctorSpecialty, doseTimes, mealRelation, recordKind } from '@/lib/normalize';
 import { newId, saveMedicine, useDB } from '../../lib/store';
 import type { MealRelation, Medicine } from '../../types';
 
@@ -43,7 +43,7 @@ export default function MedicineForm({
     setMed((m) => ({ ...m, [key]: value }));
 
   const prescriptions = records.filter(
-    (r) => r.kind === 'prescription' && r.familyMemberId === familyMemberId,
+    (r) => recordKind(r) === 'prescription' && r.familyMemberId === familyMemberId,
   );
 
   const setTimes = (times: string[]) =>

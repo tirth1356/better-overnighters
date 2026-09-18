@@ -8,6 +8,7 @@ import { deleteVaccination, newId, saveVaccination, useDB } from '../../lib/stor
 import { vaccineDate, vaccineName } from '@/lib/normalize';
 import { vaccinationStatus } from '../../lib/vaccination';
 import type { Vaccination, VaccinationStatus } from '../../types';
+import MemberSwitcher from '../common/MemberSwitcher';
 import './vaccinations.css';
 
 const STATUS_LABEL: Record<VaccinationStatus, string> = {
@@ -102,6 +103,7 @@ export default function VaccinationsPage() {
 
   return (
     <>
+      <MemberSwitcher />
       <header className="page-head">
         <div className="page-head__row">
           <div>

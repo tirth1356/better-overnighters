@@ -1,4 +1,4 @@
-import type { Doctor, MealRelation, Medicine, Vaccination } from '@/types';
+import type { Doctor, MedicalRecord, MealRelation, Medicine, Vaccination } from '@/types';
 
 /**
  * Person 1's shared types and Person 3's modules describe the same records with
@@ -59,3 +59,13 @@ export const vaccineName = (v: Vaccination): string => v.vaccine ?? v.name ?? ''
 /** Date the dose was actually given, or undefined when only scheduled. */
 export const vaccineDate = (v: Vaccination): string | undefined =>
   v.date ?? v.dateAdministered ?? undefined;
+
+/**
+ * Whether a record is a report or a prescription. Person 1's records carry a
+ * descriptive `type` ("Lab Report", "Imaging"); Person 3's carry `kind`.
+ * Reading only `kind` made every record count as neither.
+ */
+export function recordKind(r: MedicalRecord): 'report' | 'prescription' {
+  if (r.kind) return r.kind;
+  return r.type === 'Prescription' ? 'prescription' : 'report';
+}

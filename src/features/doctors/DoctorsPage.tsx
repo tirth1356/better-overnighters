@@ -86,7 +86,7 @@ export default function DoctorsPage() {
                 {d.address && <span className="doctor-card__where"><Building2 size={15} /> {d.address}</span>}
               </div>
 
-              <span className="pill">{linkCount(d.id)} linked items</span>
+              <span className="pill">{linkCount(d.id)} linked item{linkCount(d.id) === 1 ? '' : 's'}</span>
 
               <div className="doctor-card__actions">
                 <Link className="btn btn--sm" to={`/doctors/${d.id}`}>View profile</Link>
