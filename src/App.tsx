@@ -1,4 +1,4 @@
-import { HeartPulse, Pill, Stethoscope, Syringe, ShieldAlert } from 'lucide-react';
+import { HeartPulse, Pill, Sparkles, Stethoscope, Syringe, ShieldAlert } from 'lucide-react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import './app.css';
 import { MemberProvider, initials, useMember } from './lib/member';
@@ -7,6 +7,7 @@ import DoctorsPage from './features/doctors/DoctorsPage';
 import DoctorProfilePage from './features/doctors/DoctorProfilePage';
 import VaccinationsPage from './features/vaccinations/VaccinationsPage';
 import EmergencyPage from './features/emergency/EmergencyPage';
+import ExplainPage from './features/ai/ExplainPage';
 
 /**
  * Shell + routing for the Person 3 modules. Person 1 owns the final app shell:
@@ -17,6 +18,7 @@ const NAV = [
   { to: '/doctors', label: 'Doctors', icon: Stethoscope },
   { to: '/vaccinations', label: 'Vaccinations', icon: Syringe },
   { to: '/emergency', label: 'Emergency card', icon: ShieldAlert },
+  { to: '/explain', label: 'Understand a report', icon: Sparkles },
 ];
 
 function MemberSwitch() {
@@ -77,6 +79,7 @@ export default function App() {
             <Route path="/doctors/:doctorId" element={<DoctorProfilePage />} />
             <Route path="/vaccinations" element={<VaccinationsPage />} />
             <Route path="/emergency" element={<EmergencyPage />} />
+            <Route path="/explain" element={<ExplainPage />} />
           </Routes>
         </main>
       </div>

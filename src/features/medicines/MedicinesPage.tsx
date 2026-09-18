@@ -1,4 +1,4 @@
-import { Check, Pencil, Pill, Plus, SkipForward, Trash2, Undo2 } from 'lucide-react';
+import { Check, Pencil, Pill, Plus, ScanLine, SkipForward, Trash2, Undo2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Card, EmptyState } from '../../components/ui';
 import { useMember } from '../../lib/member';
@@ -7,6 +7,7 @@ import {
 } from '../../lib/schedule';
 import { deleteMedicine, setDoseStatus, useDB } from '../../lib/store';
 import type { DoseStatus, MealRelation, Medicine } from '../../types';
+import PrescriptionImport from '../ai/PrescriptionImport';
 import MedicineCalendar from './MedicineCalendar';
 import MedicineForm from './MedicineForm';
 import './medicines.css';
@@ -44,6 +45,7 @@ export default function MedicinesPage() {
   const today = toISODate(new Date());
   const [selected, setSelected] = useState(today);
   const [form, setForm] = useState<{ open: boolean; editing?: Medicine }>({ open: false });
+  const [importing, setImporting] = useState(false);
 
   const mine = useMemo(
     () => medicines.filter((m) => m.familyMemberId === member?.id),
@@ -68,9 +70,14 @@ export default function MedicinesPage() {
             <h1>Medicines</h1>
             <p>{member?.name}’s daily doses, in one place.</p>
           </div>
-          <button type="button" className="btn" onClick={() => setForm({ open: true })}>
-            <Plus size={18} /> Add medicine
-          </button>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+            <button type="button" className="btn btn--ghost" onClick={() => setImporting(true)}>
+              <ScanLine size={18} /> From prescription
+            </button>
+            <button type="button" className="btn" onClick={() => setForm({ open: true })}>
+              <Plus size={18} /> Add medicine
+            </button>
+          </div>
         </div>
       </header>
 
@@ -251,6 +258,10 @@ export default function MedicinesPage() {
             </Card>
           ))}
         </div>
+      )}
+
+      {importing && member && (
+        <PrescriptionImport familyMemberId={member.id} onClose={() => setImporting(false)} />
       )}
 
       {form.open && member && (
