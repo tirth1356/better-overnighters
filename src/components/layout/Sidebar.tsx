@@ -6,6 +6,7 @@ import {
   Pill,
   Stethoscope,
   Syringe,
+  Sparkles,
   AlertTriangle,
   LogOut,
   GitFork,
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { to: '/doctors',          icon: Stethoscope,       label: 'Doctors' },
   { to: '/vaccinations',     icon: Syringe,           label: 'Vaccinations' },
   { to: '/emergency',        icon: AlertTriangle,     label: 'Emergency' },
+  { to: '/explain',          icon: Sparkles,          label: 'Understand a Report' },
 ];
 
 export default function Sidebar() {
