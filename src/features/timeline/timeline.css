@@ -1,0 +1,47 @@
+.tl-filters { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-5); }
+.tl-filter {
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-muted);
+  border-radius: 999px; padding: 7px 15px; font-size: 0.86rem; font-weight: 600; cursor: pointer;
+}
+.tl-filter:hover { background: var(--cream); color: var(--espresso); }
+.tl-filter[aria-pressed='true'] {
+  background: var(--terracotta-soft); border-color: var(--terracotta); color: var(--clay);
+}
+
+.tl-month { margin-bottom: var(--space-6); }
+.tl-month__label {
+  font-family: var(--font-display); font-size: 1.05rem; color: var(--brown);
+  margin-bottom: var(--space-4); padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.tl-list { position: relative; padding-left: 34px; }
+.tl-list::before {
+  content: ''; position: absolute; left: 15px; top: 10px; bottom: 10px;
+  width: 2px; background: var(--sand);
+}
+
+.tl-event { position: relative; padding: var(--space-4) 0; }
+.tl-event__marker {
+  position: absolute; left: -34px; top: var(--space-4);
+  width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface); border: 2px solid var(--sand); color: var(--brown);
+}
+.tl-event--report .tl-event__marker { border-color: var(--sage); color: #4f6142; }
+.tl-event--prescription .tl-event__marker { border-color: var(--terracotta); color: var(--clay); }
+.tl-event--medicine .tl-event__marker { border-color: var(--amber); color: #8a6011; }
+.tl-event--vaccination .tl-event__marker { border-color: var(--brown); }
+.tl-event--appointment .tl-event__marker { border-color: var(--sand); }
+
+.tl-event__head { display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap; }
+.tl-event__title { font-weight: 700; }
+.tl-event__date { font-size: 0.82rem; color: var(--text-muted); }
+.tl-event__detail { color: var(--text-muted); font-size: 0.9rem; margin-top: 2px; }
+.tl-event__meta { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-3); }
+.tl-event__meta a { text-decoration: none; }
+
+@media (max-width: 560px) {
+  .tl-list { padding-left: 28px; }
+  .tl-list::before { left: 12px; }
+  .tl-event__marker { left: -28px; width: 26px; height: 26px; }
+}

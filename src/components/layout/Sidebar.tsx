@@ -7,6 +7,7 @@ import {
   Stethoscope,
   Syringe,
   Sparkles,
+  CalendarClock,
   AlertTriangle,
   LogOut,
   GitFork,
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { to: '/medicines',        icon: Pill,              label: 'Medicines' },
   { to: '/doctors',          icon: Stethoscope,       label: 'Doctors' },
   { to: '/vaccinations',     icon: Syringe,           label: 'Vaccinations' },
+  { to: '/timeline',         icon: CalendarClock,     label: 'Timeline' },
   { to: '/emergency',        icon: AlertTriangle,     label: 'Emergency' },
   { to: '/explain',          icon: Sparkles,          label: 'Understand a Report' },
 ];

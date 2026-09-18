@@ -24,6 +24,7 @@ import DoctorProfilePage from '@/features/doctors/DoctorProfilePage';
 import VaccinationsPage from '@/features/vaccinations/VaccinationsPage';
 import EmergencyPage from '@/features/emergency/EmergencyPage';
 import ExplainPage from '@/features/ai/ExplainPage';
+import TimelinePage from '@/features/timeline/TimelinePage';
 
 export const router = createBrowserRouter([
   // Public routes
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
           { path: '/doctors/:doctorId', element: <DoctorProfilePage /> },
           { path: '/vaccinations', element: <VaccinationsPage /> },
           { path: '/emergency', element: <EmergencyPage /> },
+          { path: '/timeline', element: <TimelinePage /> },
           { path: '/ai/explain', element: <ExplainPage /> },
           { path: '/explain', element: <ExplainPage /> },
         ],
