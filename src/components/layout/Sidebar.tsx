@@ -11,8 +11,10 @@ import {
   LogOut,
   GitFork,
   ChevronRight,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useMember } from '@/lib/member';
 import Logo from '@/components/ui/Logo';
 import Avatar from '@/components/ui/Avatar';
 
@@ -30,6 +32,7 @@ const NAV_ITEMS = [
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
+  const { member: activeMember, members, setMemberId } = useMember();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -68,6 +71,29 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </div>
+
+      {/* Active Member Switcher */}
+      {members && members.length > 0 && (
+        <div className="sidebar-member-section">
+          <div className="sidebar-member-header">
+            <UserCheck size={13} className="text-terra" />
+            <span className="sidebar-member-label">Active Member</span>
+          </div>
+          <select
+            id="sidebar-member-select"
+            className="sidebar-member-select"
+            value={activeMember?.id ?? members[0]?.id}
+            onChange={(e) => setMemberId(e.target.value)}
+            aria-label="Select family member"
+          >
+            {members.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name.split(' ')[0]} ({m.relationship || m.relation})
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Footer / User */}
       <div className="sidebar-footer">
@@ -145,6 +171,46 @@ const sidebarStyles = `
   .nav-item:hover .nav-chevron,
   .nav-item.active .nav-chevron {
     opacity: 0.6;
+  }
+
+  .sidebar-member-section {
+    padding: 0.75rem 1rem;
+    margin: 0 0.5rem 0.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .sidebar-member-header {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .sidebar-member-label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .sidebar-member-select {
+    width: 100%;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-espresso);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .sidebar-member-select:focus {
+    border-color: var(--color-terra);
   }
 
   .sidebar-footer {

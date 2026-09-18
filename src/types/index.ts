@@ -258,3 +258,34 @@ export interface MemberHealthSummary {
   recordCount: number;
   lastRecordDate?: string;
 }
+
+// ─── Document & Vault Types ──────────────────────────────────────
+export type DocumentType =
+  | 'blood_report'
+  | 'prescription'
+  | 'xray'
+  | 'ct_mri'
+  | 'discharge_summary'
+  | 'lab_report'
+  | 'vaccination_record'
+  | 'other'
+  | string;
+
+export interface RecordFilters {
+  searchQuery: string;
+  familyMemberId: string;
+  documentType: string;
+  doctorId: string;
+  dateFrom: string;
+  dateTo: string;
+}
+
+export interface MedicalTimelineEvent {
+  id: string;
+  familyMemberId: string;
+  date: string;
+  title: string;
+  type: 'record' | 'vaccination' | 'appointment' | string;
+  description?: string;
+  recordId?: string;
+}
