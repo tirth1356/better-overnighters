@@ -137,7 +137,7 @@ export default function PrescriptionImport({
                   checked={chosen.has(i)}
                   onChange={(e) => {
                     const next = new Set(chosen);
-                    e.target.checked ? next.add(i) : next.delete(i);
+                    if (e.target.checked) next.add(i); else next.delete(i);
                     setChosen(next);
                   }}
                 />
