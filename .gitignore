@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets — never commit real keys (GROQ_API_KEY etc.)
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+*.tsbuildinfo
