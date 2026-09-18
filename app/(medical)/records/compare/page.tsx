@@ -1,24 +1,32 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Scale } from 'lucide-react'
 import { useMedical } from '@/context/MedicalContext'
 import { ReportComparisonView } from '@/components/records/ReportComparisonView'
 
-export default function ComparePage() {
+function CompareContent() {
   const searchParams = useSearchParams()
   const focusId = searchParams.get('focus')
-
   const { records } = useMedical()
 
-  // Filter to records that have quantifiable parameters (e.g. blood reports, lab tests) or all records
   const comparableRecords = records.filter(
     r => r.documentType === 'blood_report' || r.documentType === 'lab_report'
   )
 
   const initialSelected = focusId ? [focusId] : []
 
+  return (
+    <ReportComparisonView
+      availableRecords={comparableRecords.length >= 2 ? comparableRecords : records}
+      initialSelectedIds={initialSelected}
+    />
+  )
+}
+
+export default function ComparePage() {
   return (
     <div className="space-y-6">
       {/* Top back navigation */}
@@ -45,11 +53,19 @@ export default function ComparePage() {
         </p>
       </div>
 
-      {/* Comparison Component */}
-      <ReportComparisonView
-        availableRecords={comparableRecords.length >= 2 ? comparableRecords : records}
-        initialSelectedIds={initialSelected}
-      />
+      {/* Suspense Wrapped Comparison */}
+      <Suspense
+        fallback={
+          <div className="bg-white border border-[#E8DDD0] rounded-2xl p-16 text-center space-y-4 shadow-warm-sm">
+            <div className="w-12 h-12 rounded-full bg-[#FAEAE3] text-terracotta-600 flex items-center justify-center mx-auto animate-pulse">
+              <Scale className="w-6 h-6 animate-spin" />
+            </div>
+            <p className="text-xs text-brown-500">Loading comparison module…</p>
+          </div>
+        }
+      >
+        <CompareContent />
+      </Suspense>
     </div>
   )
 }
