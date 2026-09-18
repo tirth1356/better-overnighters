@@ -1,0 +1,183 @@
+/* =========================================================
+   Better Overnighters — Global Styles
+   Design system: Cream / Ivory / Terracotta / Espresso
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Design Tokens ─────────────────────────────────── */
+:root {
+  /* Background */
+  --color-bg-page:       #FAF7F2;
+  --color-bg-surface:    #F5EFE6;
+  --color-bg-elevated:   #FFFFFF;
+  --color-bg-muted:      #F0E8DC;
+
+  /* Brand */
+  --color-terracotta:    #C4704F;
+  --color-terracotta-light: #D4856A;
+  --color-terracotta-dark:  #B05A3A;
+
+  /* Text */
+  --color-text-primary:  #2C1810;
+  --color-text-body:     #5C4A35;
+  --color-text-muted:    #8B7355;
+  --color-text-subtle:   #A89070;
+
+  /* Borders */
+  --color-border:        #E8DDD0;
+  --color-border-strong: #DCCFBE;
+
+  /* Semantic */
+  --color-success:       #5A8B4A;
+  --color-warning:       #C48B2F;
+  --color-danger:        #B54040;
+  --color-info:          #4A7A9B;
+}
+
+/* ── Base Resets ───────────────────────────────────────── */
+@layer base {
+  html {
+    background-color: var(--color-bg-page);
+    color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-bg-page);
+  }
+
+  h1, h2, h3 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    color: var(--color-text-primary);
+  }
+
+  h4, h5, h6 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: #E8C5B0;
+    color: var(--color-text-primary);
+  }
+}
+
+/* ── Utility Classes ───────────────────────────────────── */
+@layer utilities {
+  .text-espresso   { color: var(--color-text-primary); }
+  .text-warm-body  { color: var(--color-text-body); }
+  .text-warm-muted { color: var(--color-text-muted); }
+
+  .bg-page     { background-color: var(--color-bg-page); }
+  .bg-surface  { background-color: var(--color-bg-surface); }
+  .bg-elevated { background-color: var(--color-bg-elevated); }
+  .bg-muted    { background-color: var(--color-bg-muted); }
+
+  .border-warm        { border-color: var(--color-border); }
+  .border-warm-strong { border-color: var(--color-border-strong); }
+
+  /* Scrollbar styling */
+  .scrollbar-warm::-webkit-scrollbar       { width: 6px; height: 6px; }
+  .scrollbar-warm::-webkit-scrollbar-track { background: var(--color-bg-surface); }
+  .scrollbar-warm::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 9999px;
+  }
+  .scrollbar-warm::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-subtle);
+  }
+}
+
+/* ── Component Layer ───────────────────────────────────── */
+@layer components {
+  /* Card */
+  .card {
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 0.875rem;
+    box-shadow: 0 2px 8px rgba(44,24,16,0.06);
+  }
+
+  .card-hover {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .card-hover:hover {
+    box-shadow: 0 6px 20px rgba(44,24,16,0.12);
+    transform: translateY(-1px);
+  }
+
+  /* Section heading */
+  .section-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0;
+  }
+
+  /* Badge */
+  .badge-terracotta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    background-color: #FAEAE3;
+    color: var(--color-terracotta-dark);
+    border: 1px solid #F0CCBA;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .badge-sage {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    background-color: #EEF4EA;
+    color: #4A6B38;
+    border: 1px solid #C8DAB8;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .badge-warm {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    background-color: var(--color-bg-muted);
+    color: var(--color-text-body);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+}
