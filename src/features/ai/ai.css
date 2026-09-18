@@ -37,6 +37,6 @@
 
 .extracted { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-bottom: 1px solid var(--border); }
 .extracted:last-of-type { border-bottom: none; }
-.extracted__main { flex: 1; min-width: 0; }
+.extracted__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .extracted__name { font-weight: 600; }
 .extracted__meta { font-size: 0.84rem; color: var(--text-muted); }

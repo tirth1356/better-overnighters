@@ -22,6 +22,8 @@
   cursor: pointer; background: var(--terracotta); color: var(--ivory);
   transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
 }
+a.btn { text-decoration: none; color: var(--ivory); }
+a.btn--ghost, a.btn--danger { color: var(--espresso); }
 .btn:hover { background: #ad5534; box-shadow: var(--shadow); }
 .btn:active { transform: translateY(1px); }
 .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
