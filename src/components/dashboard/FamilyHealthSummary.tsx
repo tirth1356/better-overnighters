@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
-import { mockFamilyMembers, getMedicinesForMember, getRecordsForMember } from '@/data/mockData';
+import { useDB } from '@/lib/store';
 import Avatar from '@/components/ui/Avatar';
 
 export default function FamilyHealthSummary() {
+  const db = useDB();
+
   return (
     <div className="card fhs-card">
       <div className="fhs-header">
@@ -14,17 +16,20 @@ export default function FamilyHealthSummary() {
       </div>
 
       <div className="fhs-list">
-        {mockFamilyMembers.map(member => {
-          const medicines = getMedicinesForMember(member.id);
-          const records   = getRecordsForMember(member.id);
-          const taken     = member.activeMedicineCount ?? 0; // mock: assume all taken
+        {db.members.map(member => {
+          const medicines = db.medicines.filter(m => m.familyMemberId === member.id && m.isActive);
+          const records   = db.records.filter(r => r.familyMemberId === member.id);
           const total     = medicines.length;
-          const progress  = total > 0 ? (taken / total) * 100 : 100;
+          // Count taken doses for this member today
+          const takenToday = db.doses.filter(
+            d => d.status === 'taken' && medicines.some(m => m.id === d.medicineId)
+          ).length;
+          const progress  = total > 0 ? Math.min(100, (takenToday / total) * 100) : 100;
 
           return (
             <Link
               key={member.id}
-              to={`/family/${member.id}`}
+              to={`/family`}
               className="fhs-row"
               id={`fhs-member-${member.id}`}
             >
@@ -38,14 +43,14 @@ export default function FamilyHealthSummary() {
               <div className="fhs-member-info">
                 <div className="fhs-member-top">
                   <span className="fhs-member-name">{member.name.split(' ')[0]}</span>
-                  <span className="fhs-member-rel">{member.relationship}</span>
+                  <span className="fhs-member-rel">{member.relationship || member.relation}</span>
                 </div>
                 {total > 0 ? (
                   <div className="fhs-progress-row">
                     <div className="fhs-progress-bar">
                       <div className="fhs-progress-fill" style={{ width: `${progress}%` }} />
                     </div>
-                    <span className="fhs-progress-label">{taken}/{total} medicines</span>
+                    <span className="fhs-progress-label">{medicines.length} active medicine{medicines.length !== 1 ? 's' : ''}</span>
                   </div>
                 ) : (
                   <span className="fhs-no-med">No active medicines</span>
@@ -56,7 +61,7 @@ export default function FamilyHealthSummary() {
                   <span className="fhs-records-count">{records.length}</span>
                   <span className="fhs-records-label">records</span>
                 </div>
-                {total > 0 && taken === total && (
+                {total > 0 && progress >= 100 && (
                   <CheckCircle2 size={16} className="fhs-done-icon" />
                 )}
               </div>

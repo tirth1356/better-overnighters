@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, FileText, FlaskConical, Scan, Stethoscope } from 'lucide-react';
-import { mockMedicalRecords, getMemberById } from '@/data/mockData';
+import { useDB } from '@/lib/store';
 import type { MedicalRecordType } from '@/types';
 import { formatDate } from '@/utils';
 
@@ -22,9 +22,10 @@ function recordBadgeClass(type: MedicalRecordType): string {
   }
 }
 
-const RECENT = mockMedicalRecords.slice(0, 5);
-
 export default function RecentRecords() {
+  const db = useDB();
+  const recent = db.records.slice(0, 5);
+
   return (
     <div className="card rr-card">
       <div className="rr-header">
@@ -35,27 +36,39 @@ export default function RecentRecords() {
       </div>
 
       <div className="rr-list">
-        {RECENT.map(record => {
-          const member = getMemberById(record.familyMemberId);
-          return (
-            <div key={record.id} className="rr-row" id={`record-${record.id}`}>
-              <div className="rr-icon">
-                {recordIcon(record.type)}
-              </div>
-              <div className="rr-info">
-                <p className="rr-title">{record.title}</p>
-                <p className="rr-meta">
-                  {member ? member.name.split(' ')[0] : '—'}
-                  {record.doctorName ? ` · ${record.doctorName}` : ''}
-                </p>
-              </div>
-              <div className="rr-right">
-                <span className={recordBadgeClass(record.type)}>{record.type}</span>
-                <span className="rr-date">{formatDate(record.date)}</span>
-              </div>
-            </div>
-          );
-        })}
+        {recent.length === 0 ? (
+          <p style={{ color: 'var(--color-text-light)', fontSize: '0.875rem', padding: '1rem 0' }}>
+            No medical records yet. Upload a report to start your vault.
+          </p>
+        ) : (
+          recent.map(record => {
+            const member = db.members.find(m => m.id === record.familyMemberId);
+            return (
+              <Link
+                key={record.id}
+                to={`/records/${record.id}`}
+                className="rr-row"
+                id={`record-${record.id}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <div className="rr-icon">
+                  {recordIcon(record.type)}
+                </div>
+                <div className="rr-info">
+                  <p className="rr-title">{record.title}</p>
+                  <p className="rr-meta">
+                    {member ? member.name.split(' ')[0] : '—'}
+                    {record.doctorName ? ` · ${record.doctorName}` : ''}
+                  </p>
+                </div>
+                <div className="rr-right">
+                  <span className={recordBadgeClass(record.type)}>{record.type}</span>
+                  <span className="rr-date">{formatDate(record.date)}</span>
+                </div>
+              </Link>
+            );
+          })
+        )}
       </div>
 
       <style>{`
@@ -68,8 +81,10 @@ export default function RecentRecords() {
           display: flex; align-items: center; gap: 0.875rem;
           padding: 0.875rem 0;
           border-bottom: 1px solid var(--color-border);
+          transition: background 0.15s ease;
         }
         .rr-row:last-child { border-bottom: none; }
+        .rr-row:hover { background: var(--color-bg); margin: 0 -0.5rem; padding-left: 0.5rem; padding-right: 0.5rem; border-radius: var(--radius-sm); }
         .rr-icon {
           width: 36px; height: 36px;
           border-radius: var(--radius-md);

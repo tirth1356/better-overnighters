@@ -1,40 +1,46 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { FamilyMember } from '@/types';
-import { mockFamilyMembers } from '@/data/mockData';
+import { useDB } from '@/lib/store';
 import Avatar from '@/components/ui/Avatar';
 import { BloodBadge } from '@/components/ui/Badge';
 import { calcAge } from '@/utils';
-import { X, Pill, FileText, Phone } from 'lucide-react';
-
-// ─── Tree layout definition ───────────────────────────────────────
-// Grandfather (top)
-//    Dad ── Mom
-//       Tirth  Sister
+import { X, Pill, FileText, Phone, ArrowRight, AlertTriangle } from 'lucide-react';
 
 interface TreeNode {
   memberId: string;
   children?: TreeNode[];
 }
 
-const TREE_STRUCTURE: TreeNode = {
-  memberId: 'member-004', // Grandfather
+const DEFAULT_TREE: TreeNode = {
+  memberId: 'member-004', // Grandfather (Hirabhai)
   children: [
     {
-      memberId: 'member-003', // Dad
+      memberId: 'member-003', // Dad (Rajesh)
       children: [
-        { memberId: 'member-001' }, // Tirth
-        { memberId: 'member-005' }, // Sister
+        { memberId: 'member-001' }, // Tirth (Self)
+        { memberId: 'member-005' }, // Sister (Priya)
       ],
     },
     {
-      memberId: 'member-002', // Mom
+      memberId: 'member-002', // Mom (Meena)
     },
   ],
 };
 
-// ─── Detail panel ─────────────────────────────────────────────────
-function MemberDetail({ member, onClose }: { member: FamilyMember; onClose: () => void }) {
+function MemberDetail({
+  member,
+  activeMedicineCount,
+  medicalRecordCount,
+  onClose,
+}: {
+  member: FamilyMember;
+  activeMedicineCount: number;
+  medicalRecordCount: number;
+  onClose: () => void;
+}) {
   const age = calcAge(member.dateOfBirth);
+
   return (
     <div className="tree-detail animate-fade-up">
       <div className="tree-detail-header">
@@ -47,15 +53,15 @@ function MemberDetail({ member, onClose }: { member: FamilyMember; onClose: () =
         />
         <div className="tree-detail-info">
           <h3>{member.name}</h3>
-          <p>{member.relationship} · {age} years</p>
+          <p>{member.relationship || member.relation} · {age} years</p>
           <BloodBadge value={member.bloodGroup} />
         </div>
-        <button className="btn btn-ghost btn-sm" onClick={onClose} aria-label="Close">
+        <button className="btn btn-ghost btn-sm" onClick={onClose} aria-label="Close details">
           <X size={16} />
         </button>
       </div>
 
-      {member.conditions.length > 0 && (
+      {member.conditions && member.conditions.length > 0 && (
         <div className="tree-detail-section">
           <p className="tree-detail-label">Conditions</p>
           <div className="tree-detail-tags">
@@ -66,7 +72,7 @@ function MemberDetail({ member, onClose }: { member: FamilyMember; onClose: () =
         </div>
       )}
 
-      {member.allergies.length > 0 && (
+      {member.allergies && member.allergies.length > 0 && (
         <div className="tree-detail-section">
           <p className="tree-detail-label">Allergies</p>
           <div className="tree-detail-tags">
@@ -80,12 +86,12 @@ function MemberDetail({ member, onClose }: { member: FamilyMember; onClose: () =
       <div className="tree-detail-stats">
         <div className="tree-detail-stat">
           <Pill size={16} />
-          <span>{member.activeMedicineCount ?? 0}</span>
+          <span>{activeMedicineCount}</span>
           <span>Medicines</span>
         </div>
         <div className="tree-detail-stat">
           <FileText size={16} />
-          <span>{member.medicalRecordCount ?? 0}</span>
+          <span>{medicalRecordCount}</span>
           <span>Records</span>
         </div>
       </div>
@@ -94,35 +100,51 @@ function MemberDetail({ member, onClose }: { member: FamilyMember; onClose: () =
         <div className="tree-detail-emergency">
           <Phone size={13} />
           <span>
-            <strong>{member.emergencyContactName}</strong> · {member.emergencyContact}
+            <strong>{member.emergencyContactName ?? 'Contact'}</strong> · {member.emergencyContact}
           </span>
         </div>
       )}
+
+      {/* Direct Module Navigation */}
+      <div className="tree-detail-actions">
+        <Link to="/medicines" className="tree-action-btn">
+          <Pill size={14} />
+          Medicines
+          <ArrowRight size={12} />
+        </Link>
+        <Link to="/medical-records" className="tree-action-btn">
+          <FileText size={14} />
+          Records
+          <ArrowRight size={12} />
+        </Link>
+        <Link to="/emergency" className="tree-action-btn emergency">
+          <AlertTriangle size={14} />
+          Emergency Card
+          <ArrowRight size={12} />
+        </Link>
+      </div>
     </div>
   );
 }
 
-// ─── Single tree node ─────────────────────────────────────────────
 function TreeNodeCard({
-  memberId,
+  member,
   selected,
   onSelect,
 }: {
-  memberId: string;
+  member: FamilyMember;
   selected: boolean;
   onSelect: (id: string) => void;
 }) {
-  const member = mockFamilyMembers.find(m => m.id === memberId);
-  if (!member) return null;
   const age = calcAge(member.dateOfBirth);
 
   return (
     <button
       className={`tree-node ${selected ? 'selected' : ''}`}
-      onClick={() => onSelect(memberId)}
-      id={`tree-node-${memberId}`}
+      onClick={() => onSelect(member.id)}
+      id={`tree-node-${member.id}`}
       aria-pressed={selected}
-      aria-label={`${member.name}, ${member.relationship}`}
+      aria-label={`${member.name}, ${member.relationship || member.relation}`}
     >
       <Avatar
         src={member.avatarUrl}
@@ -133,27 +155,30 @@ function TreeNodeCard({
       />
       <div className="tree-node-info">
         <p className="tree-node-name">{member.name.split(' ')[0]}</p>
-        <p className="tree-node-age">{age} yrs</p>
+        <p className="tree-node-age">{member.relationship || member.relation} · {age} yrs</p>
       </div>
       <BloodBadge value={member.bloodGroup} />
     </button>
   );
 }
 
-// ─── Recursive tree renderer ──────────────────────────────────────
 function renderTree(
   node: TreeNode,
+  membersMap: Map<string, FamilyMember>,
   selectedId: string | null,
   onSelect: (id: string) => void,
   depth = 0,
 ): React.ReactNode {
+  const member = membersMap.get(node.memberId);
+  if (!member) return null;
+
   const hasChildren = node.children && node.children.length > 0;
 
   return (
     <div key={node.memberId} className={`tree-level depth-${depth}`}>
       <div className="tree-node-wrapper">
         <TreeNodeCard
-          memberId={node.memberId}
+          member={member}
           selected={selectedId === node.memberId}
           onSelect={onSelect}
         />
@@ -163,11 +188,10 @@ function renderTree(
         <>
           <div className="tree-connector-vertical" aria-hidden="true" />
           <div className="tree-children">
-            <div className="tree-connector-horizontal" aria-hidden="true" />
             {node.children!.map((child) => (
               <div key={child.memberId} className="tree-child-branch">
                 <div className="tree-connector-child" aria-hidden="true" />
-                {renderTree(child, selectedId, onSelect, depth + 1)}
+                {renderTree(child, membersMap, selectedId, onSelect, depth + 1)}
               </div>
             ))}
           </div>
@@ -177,25 +201,35 @@ function renderTree(
   );
 }
 
-// ─── Main FamilyTree component ────────────────────────────────────
 export default function FamilyTree() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const db = useDB();
+  const [selectedId, setSelectedId] = useState<string | null>('member-002'); // Default to Mom for quick inspection
 
-  const selectedMember = selectedId
-    ? mockFamilyMembers.find(m => m.id === selectedId) ?? null
-    : null;
+  const membersMap = new Map<string, FamilyMember>();
+  db.members.forEach(m => membersMap.set(m.id, m));
+
+  const selectedMember = selectedId ? membersMap.get(selectedId) ?? null : null;
+
+  const activeMedCount = selectedMember
+    ? db.medicines.filter(m => m.familyMemberId === selectedMember.id && m.isActive).length
+    : 0;
+  const recordCount = selectedMember
+    ? db.records.filter(r => r.familyMemberId === selectedMember.id).length
+    : 0;
 
   return (
     <div className="family-tree-container">
       <div className="family-tree-scroll">
         <div className="family-tree" role="tree" aria-label="Patel family tree">
-          {renderTree(TREE_STRUCTURE, selectedId, setSelectedId)}
+          {renderTree(DEFAULT_TREE, membersMap, selectedId, setSelectedId)}
         </div>
       </div>
 
       {selectedMember && (
         <MemberDetail
           member={selectedMember}
+          activeMedicineCount={activeMedCount}
+          medicalRecordCount={recordCount}
           onClose={() => setSelectedId(null)}
         />
       )}
@@ -208,22 +242,25 @@ export default function FamilyTree() {
 const treeStyles = `
   .family-tree-container {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 340px;
     gap: 2rem;
     align-items: start;
-    min-height: 400px;
+    min-height: 420px;
   }
 
   .family-tree-scroll {
     overflow-x: auto;
-    padding: 1rem;
+    padding: 1.5rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
   }
 
   .family-tree {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 600px;
+    min-width: 540px;
   }
 
   .tree-level {
@@ -240,16 +277,16 @@ const treeStyles = `
   .tree-node {
     display: flex;
     align-items: center;
-    gap: 0.625rem;
-    padding: 0.75rem 1rem;
-    background: var(--color-surface);
+    gap: 0.75rem;
+    padding: 0.75rem 1.125rem;
+    background: var(--color-bg);
     border: 1.5px solid var(--color-border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all var(--transition-base);
     box-shadow: var(--shadow-sm);
     text-align: left;
-    min-width: 160px;
+    min-width: 175px;
   }
 
   .tree-node:hover {
@@ -260,16 +297,17 @@ const treeStyles = `
 
   .tree-node.selected {
     border-color: var(--color-terra);
-    background: rgba(184,111,82,0.06);
-    box-shadow: 0 0 0 3px rgba(184,111,82,0.15), var(--shadow-md);
+    background: rgba(184,111,82,0.08);
+    box-shadow: 0 0 0 3px rgba(184,111,82,0.18), var(--shadow-md);
   }
 
   .tree-node-info {
     flex: 1;
+    min-width: 0;
   }
 
   .tree-node-name {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--color-text);
   }
@@ -283,7 +321,7 @@ const treeStyles = `
   /* Connectors */
   .tree-connector-vertical {
     width: 2px;
-    height: 28px;
+    height: 24px;
     background: var(--color-border-dark);
     margin: 0 auto;
   }
@@ -295,16 +333,6 @@ const treeStyles = `
     position: relative;
   }
 
-  .tree-connector-horizontal {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    right: 50%;
-    height: 2px;
-    background: var(--color-border-dark);
-    display: none; /* handled per child */
-  }
-
   .tree-child-branch {
     display: flex;
     flex-direction: column;
@@ -314,40 +342,26 @@ const treeStyles = `
 
   .tree-connector-child {
     width: 2px;
-    height: 28px;
+    height: 24px;
     background: var(--color-border-dark);
   }
 
-  /* Cross-sibling connector */
-  .tree-children::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: calc(80px);
-    right: calc(80px);
-    height: 2px;
-    background: var(--color-border-dark);
-  }
-
-  /* Detail panel */
+  /* Detail Card */
   .tree-detail {
-    width: 300px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
     padding: 1.5rem;
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    flex-direction: column;
-    gap: 1.125rem;
+    box-shadow: var(--shadow-md);
     position: sticky;
-    top: calc(var(--topbar-height) + 1rem);
+    top: 1rem;
   }
 
   .tree-detail-header {
     display: flex;
-    align-items: flex-start;
-    gap: 0.875rem;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
   }
 
   .tree-detail-info {
@@ -355,31 +369,29 @@ const treeStyles = `
   }
 
   .tree-detail-info h3 {
-    font-family: var(--font-sans);
-    font-size: 1rem;
-    font-weight: 600;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
     color: var(--color-text);
-    margin: 0 0 2px;
+    margin: 0 0 0.125rem;
   }
 
   .tree-detail-info p {
     font-size: 0.8125rem;
     color: var(--color-text-muted);
-    margin: 0 0 6px;
+    margin: 0 0 0.375rem;
   }
 
   .tree-detail-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
+    margin-bottom: 1rem;
   }
 
   .tree-detail-label {
     font-size: 0.75rem;
     font-weight: 600;
+    color: var(--color-text-light);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-text-muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.375rem;
   }
 
   .tree-detail-tags {
@@ -389,44 +401,79 @@ const treeStyles = `
   }
 
   .tree-detail-stats {
-    display: flex;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+    padding: 0.875rem;
+    background: var(--color-bg);
+    border-radius: var(--radius-md);
   }
 
   .tree-detail-stat {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.375rem;
-    font-size: 0.875rem;
+    gap: 0.25rem;
+    font-size: 0.75rem;
     color: var(--color-text-muted);
   }
 
-  .tree-detail-stat span:nth-child(2) {
+  .tree-detail-stat span:first-of-type {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--color-text);
-    font-size: 1rem;
   }
 
   .tree-detail-emergency {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--color-text);
+    padding: 0.625rem 0.75rem;
+    background: rgba(184,111,82,0.06);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-terra);
+    margin-bottom: 1.25rem;
+  }
+
+  .tree-detail-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tree-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text);
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: 0.625rem 0.875rem;
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .tree-action-btn:hover {
+    background: var(--color-cream);
+    border-color: var(--color-terra);
+    color: var(--color-terra-dark);
+  }
+
+  .tree-action-btn.emergency:hover {
+    border-color: #d97706;
+    color: #b45309;
   }
 
   @media (max-width: 900px) {
     .family-tree-container {
       grid-template-columns: 1fr;
-    }
-
-    .tree-detail {
-      width: 100%;
-      position: static;
     }
   }
 `;

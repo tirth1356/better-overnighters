@@ -1,51 +1,49 @@
 import { Users, Pill, FileText, CalendarClock } from 'lucide-react';
-import { dashboardStats } from '@/data/mockData';
-
-interface Stat {
-  label:    string;
-  value:    number;
-  icon:     React.ComponentType<{ size?: number; strokeWidth?: number; }>;
-  color:    string;
-  bg:       string;
-  sublabel: string;
-}
-
-const stats: Stat[] = [
-  {
-    label:    'Family Members',
-    value:    dashboardStats.totalMembers,
-    icon:     Users,
-    color:    'var(--color-brown)',
-    bg:       'var(--color-cream)',
-    sublabel: 'Active profiles',
-  },
-  {
-    label:    'Active Medicines',
-    value:    dashboardStats.activeMedicines,
-    icon:     Pill,
-    color:    'var(--color-terra)',
-    bg:       'rgba(184,111,82,0.1)',
-    sublabel: 'Across all members',
-  },
-  {
-    label:    'Medical Records',
-    value:    dashboardStats.totalRecords,
-    icon:     FileText,
-    color:    'var(--color-sage-dark)',
-    bg:       'rgba(124,146,116,0.12)',
-    sublabel: 'Total documents',
-  },
-  {
-    label:    'Upcoming Apts.',
-    value:    dashboardStats.upcomingAppointments,
-    icon:     CalendarClock,
-    color:    '#5A8AC8',
-    bg:       'rgba(90,138,200,0.1)',
-    sublabel: 'This month',
-  },
-];
+import { useDB } from '@/lib/store';
 
 export default function OverviewCards() {
+  const db = useDB();
+
+  const totalMembers = db.members.length;
+  const activeMedicines = db.medicines.filter(m => m.isActive).length;
+  const totalRecords = db.records.length;
+  const upcomingAppointments = (db.appointments || []).filter(a => a.status === 'Upcoming').length;
+
+  const stats = [
+    {
+      label:    'Family Members',
+      value:    totalMembers,
+      icon:     Users,
+      color:    'var(--color-brown)',
+      bg:       'var(--color-cream)',
+      sublabel: 'Active profiles',
+    },
+    {
+      label:    'Active Medicines',
+      value:    activeMedicines,
+      icon:     Pill,
+      color:    'var(--color-terra)',
+      bg:       'rgba(184,111,82,0.1)',
+      sublabel: 'Across all members',
+    },
+    {
+      label:    'Medical Records',
+      value:    totalRecords,
+      icon:     FileText,
+      color:    'var(--color-sage-dark)',
+      bg:       'rgba(124,146,116,0.12)',
+      sublabel: 'Total documents',
+    },
+    {
+      label:    'Upcoming Apts.',
+      value:    upcomingAppointments,
+      icon:     CalendarClock,
+      color:    '#5A8AC8',
+      bg:       'rgba(90,138,200,0.1)',
+      sublabel: 'This month',
+    },
+  ];
+
   return (
     <div className="overview-grid">
       {stats.map((s, i) => {

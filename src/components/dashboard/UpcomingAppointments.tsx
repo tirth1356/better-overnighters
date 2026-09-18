@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarClock, MapPin } from 'lucide-react';
-import { getUpcomingAppointments, getMemberById } from '@/data/mockData';
+import { useDB } from '@/lib/store';
 import { daysUntil } from '@/utils';
 import Avatar from '@/components/ui/Avatar';
 
 export default function UpcomingAppointments() {
-  const appointments = getUpcomingAppointments();
+  const db = useDB();
+  const appointments = (db.appointments || []).filter(a => a.status === 'Upcoming');
 
   return (
     <div className="card ua-card">
@@ -24,7 +25,7 @@ export default function UpcomingAppointments() {
       ) : (
         <div className="ua-list">
           {appointments.map(apt => {
-            const member = getMemberById(apt.familyMemberId);
+            const member = db.members.find(m => m.id === apt.familyMemberId);
             const days   = daysUntil(apt.dateTime);
             const urgent = days <= 3;
 

@@ -1,27 +1,45 @@
-import { useState } from 'react';
 import { Users, GitFork } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { FamilyMember } from '@/types';
-import { mockFamilyMembers } from '@/data/mockData';
+import { useDB, saveMember, deleteMember, newId } from '@/lib/store';
 import FamilyGrid from '@/components/family/FamilyGrid';
 
-let nextId = 100;
-
 export default function FamilyPage() {
-  const [members, setMembers] = useState<FamilyMember[]>(mockFamilyMembers);
+  const db = useDB();
+
+  // Enrich members with real-time counts from live store
+  const members: FamilyMember[] = db.members.map(m => ({
+    ...m,
+    activeMedicineCount: db.medicines.filter(med => med.familyMemberId === m.id && med.isActive).length,
+    medicalRecordCount: db.records.filter(r => r.familyMemberId === m.id).length,
+  }));
 
   function handleAdd(data: Omit<FamilyMember, 'id'>) {
-    const newMember: FamilyMember = { ...data, id: `member-${++nextId}` };
-    setMembers(prev => [...prev, newMember]);
+    const memberId = newId('member');
+    const newMember: FamilyMember = {
+      ...data,
+      id: memberId,
+      relation: data.relationship,
+      activeMedicineCount: 0,
+      medicalRecordCount: 0,
+    };
+    saveMember(newMember);
   }
 
   function handleEdit(id: string, data: Omit<FamilyMember, 'id'>) {
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, ...data } : m));
+    const existing = db.members.find(m => m.id === id);
+    if (!existing) return;
+    const updated: FamilyMember = {
+      ...existing,
+      ...data,
+      relation: data.relationship,
+    };
+    saveMember(updated);
   }
 
   function handleDelete(id: string) {
-    if (window.confirm('Remove this family member? This action cannot be undone.')) {
-      setMembers(prev => prev.filter(m => m.id !== id));
+    if (window.confirm('Remove this family member? All associated health records, medicines, and appointments will also be cleaned up.')) {
+      deleteMember(id);
     }
   }
 
